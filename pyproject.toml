@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "flappy-bird-agent"
+version = "0.1.0"
+description = "PPO agent for Flappy Bird using stable-baselines3"
+authors = [{name = "Your Name"}]
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+	"stable-baselines3[extra]",
+	"gymnasium",
+	"pygame",
+	"opencv-python",
+	"tensorboard",
+	"numpy",
+	"torch",
+	"matplotlib",
+	"pillow",
+]
+
+[project.urls]
+homepage = "https://example.com"
+
+[tool.setuptools]
+packages = {find = {}}
+
+[project.scripts]
+flappy-train = "scripts.train:main"
+flappy-eval = "scripts.evaluate:main"

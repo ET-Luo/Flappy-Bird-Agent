@@ -157,10 +157,49 @@ class FlappyBirdEnv(gym.Env):
 		info = {"score": self._score}
 		return obs, float(reward), bool(terminated), bool(truncated), info
 
+	def _render_frame(self) -> np.ndarray:
+		# Simple RGB frame with bird, pipes, and ground
+		h = self.config.screen_height
+		w = self.config.screen_width
+		frame = np.zeros((h, w, 3), dtype=np.uint8)
+
+		# Background sky
+		frame[:, :] = (135, 206, 235)  # light sky blue (BGR-like but we're in RGB order)
+
+		# Ground
+		ground_y = self.config.ground_y
+		frame[ground_y:h, :, :] = (222, 184, 135)  # burlywood
+
+		# Pipe
+		next_x, gap_center = self._next_pipe
+		gap = self.config.pipe_gap
+		top_end = max(0, gap_center - gap // 2)
+		bottom_start = min(ground_y, gap_center + gap // 2)
+		pipe_color = (34, 139, 34)  # forest green
+		pipe_half_w = 26
+		left = max(0, next_x - pipe_half_w)
+		right = min(w, next_x + pipe_half_w)
+		# top pipe
+		frame[0:top_end, left:right, :] = pipe_color
+		# bottom pipe
+		frame[bottom_start:ground_y, left:right, :] = pipe_color
+
+		# Bird
+		bird_x = self.config.bird_x
+		bird_y = int(self.state[0]) if self.state is not None else self.config.start_y
+		bird_color = (255, 215, 0)  # gold
+		bird_radius = 6
+		by0 = max(0, bird_y - bird_radius)
+		by1 = min(h, bird_y + bird_radius)
+		bx0 = max(0, bird_x - bird_radius)
+		bx1 = min(w, bird_x + bird_radius)
+		frame[by0:by1, bx0:bx1, :] = bird_color
+
+		return frame
+
 	def render(self):
-		# Pixel rendering will be added later; for now return None or rgb array placeholder
 		if self.render_mode == "rgb_array":
-			return np.zeros((self.config.screen_height, self.config.screen_width, 3), dtype=np.uint8)
+			return self._render_frame()
 		return None
 
 	def close(self):
